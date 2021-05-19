@@ -1,4 +1,4 @@
-import 'package:bank_jago_assesment/pages/register_stepper.dart';
+import 'package:bank_jago_assesment/pages/register_steps_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,6 +15,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: RegisterStepper());
+        home: RegisterSteps());
   }
 }
