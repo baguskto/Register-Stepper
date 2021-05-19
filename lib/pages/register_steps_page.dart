@@ -10,6 +10,14 @@ class _RegisterStepsState extends State<RegisterSteps> {
   int _currentStep = 0;
   CustomStepperType stepperType = CustomStepperType.vertical;
   Color bgColor = Colors.white;
+  TextEditingController emailController = TextEditingController();
+
+
+  bool isValidEmail(input) {
+    return RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(input);
+  }
 
   void _showToast(BuildContext context) {
     final scaffold = ScaffoldMessenger.of(context);
@@ -58,6 +66,111 @@ class _RegisterStepsState extends State<RegisterSteps> {
     }
   }
 
+
+  Widget emailPage() {
+    return Container(
+      color: Colors.lightBlue,
+      height: MediaQuery.of(context).size.height / 1.5,
+      child: Stack(
+        children: [
+          Positioned(
+            bottom: MediaQuery.of(context).size.height / 3.5,
+            child: CustomPaint(
+              size: Size(MediaQuery.of(context).size.width,
+                  (MediaQuery.of(context).size.width * 0.74875).toDouble()),
+              painter: WidgetBgEmailPath(),
+            ),
+          ),
+          Positioned(
+            bottom: MediaQuery.of(context).size.height / 20,
+            child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Welcome to",
+                      style:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "GIN",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 36),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Finans",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 36,
+                              color: Colors.blue),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Welcome to The Bank of The Future.\nManage and track your accounts on\nthe go.",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width - 48,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        onSaved: (input) => emailController.text = input,
+                        validator: (input) =>
+                        !isValidEmail(input) ? "Email tidak valid" : null,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey.shade200,
+                          labelText: "Email",
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          labelStyle: TextStyle(color: Colors.grey),
+                          contentPadding: EdgeInsets.all(12),
+                          hintText: 'example@email.com',
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .focusColor
+                                  .withOpacity(0.7)),
+                          prefixIcon: Icon(Icons.mail_outline_rounded,
+                              color: Colors.grey),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white)),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white)),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 80,
+                    ),
+                  ],
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,9 +211,7 @@ class _RegisterStepsState extends State<RegisterSteps> {
                   },
                   steps: <CustomStep>[
                     CustomStep(
-                      content: Container(
-                        child: Text("1"),
-                      ),
+                      content: emailPage(),
                       isActive: _currentStep >= 1,
                     ),
                     CustomStep(
