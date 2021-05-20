@@ -1,5 +1,6 @@
 import 'package:bank_jago_assesment/constant.dart';
 import 'package:bank_jago_assesment/widgets/widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RegisterSteps extends StatefulWidget {
@@ -19,6 +20,12 @@ class _RegisterStepsState extends State<RegisterSteps> {
 
   String goalSelected, incomeSelected, expenseSelected;
 
+  DateTime selectedDate = DateTime.now();
+  DateTime selectedTimeIos;
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  String selectedDateFormatted;
+  var selectedTimeFormatted;
 
   Text complexity = Text(
     "Very weak",
@@ -76,6 +83,103 @@ class _RegisterStepsState extends State<RegisterSteps> {
         changeBgColor(_currentStep);
       });
     }
+  }
+
+  DateTime getDateTime() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day, now.hour, 0);
+  }
+
+  /// This builds cupertion date picker in iOS
+  buildCupertinoDatePicker(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext builder) {
+          return Container(
+            height: MediaQuery.of(context).copyWith().size.height / 3,
+            color: Colors.white,
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              onDateTimeChanged: (picked) {
+                if (picked != null && picked != selectedDate)
+                  setState(() {
+                    selectedDate = picked;
+                    selectedDateFormatted =
+                        Constant.dateFormatter(selectedDate);
+                  });
+              },
+              initialDateTime: selectedDate,
+              minimumYear: 2000,
+              maximumYear: 2025,
+            ),
+          );
+        });
+  }
+
+  /// This builds material date picker in Android
+  buildMaterialDatePicker(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2025),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light(),
+          child: child,
+        );
+      },
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+        selectedDateFormatted = Constant.dateFormatter(selectedDate);
+      });
+  }
+
+  /// This builds cupertion time picker in iOS
+  buildCupertinoTimePicker(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext builder) {
+          return Container(
+            height: MediaQuery.of(context).copyWith().size.height / 3,
+            color: Colors.white,
+            child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.time,
+                minuteInterval: 30,
+                use24hFormat: true,
+                onDateTimeChanged: (picked) {
+                  if (picked != null && picked != selectedTimeIos)
+                    setState(() {
+                      selectedTimeIos = picked;
+                      selectedTimeFormatted =
+                          Constant.timeFormatter(selectedTimeIos);
+                    });
+                },
+                initialDateTime: DateTime(
+                    selectedDate.minute,
+                    selectedDate.month,
+                    selectedDate.day,
+                    selectedDate.hour,
+                    (selectedDate.minute / 5 * 5).toInt())
+                // selectedTimeIos,
+                ),
+          );
+        });
+  }
+
+  /// This builds material date picker in Android
+  buildMaterialTimePicker(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+    );
+    if (picked != null && picked != selectedTime)
+      setState(() {
+        selectedTime = picked;
+        selectedTimeFormatted = "${selectedTime.hour}:${selectedTime.minute}";
+      });
   }
 
   Widget emailPage() {
@@ -355,6 +459,64 @@ class _RegisterStepsState extends State<RegisterSteps> {
     );
   }
 
+  Widget videoCallSchedule() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      height: MediaQuery.of(context).size.height / 1.5,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          WidgetCalenderAnimation(),
+          SizedBox(
+            height: 25,
+          ),
+          Text(
+            "Schedule Video Call",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "Choose the date and time that you preferred, we will send a link via email to make a video call on the schedule date and time.",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          WidgetScheduleField(
+            label: "Date",
+            onTap: () {
+              Theme.of(context).platform == TargetPlatform.iOS
+                  ? buildCupertinoDatePicker(context)
+                  : buildMaterialDatePicker(context);
+            },
+            hint: selectedDateFormatted ?? "- Choose date -",
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          WidgetScheduleField(
+            label: "Time",
+            onTap: () {
+              Theme.of(context).platform == TargetPlatform.iOS
+                  ? buildCupertinoTimePicker(context)
+                  : buildMaterialTimePicker(context);
+            },
+            hint: selectedTimeFormatted != null
+                ? selectedTimeFormatted.toString()
+                : "- Choose time -",
+          ),
+          SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
