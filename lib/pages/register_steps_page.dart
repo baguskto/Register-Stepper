@@ -67,10 +67,34 @@ class _RegisterStepsState extends State<RegisterSteps> {
     });
   }
 
+  bool passwordFilled() {
+    if (hasLowercase == true &&
+        hasUppercase == true &&
+        hasDigits == true &&
+        hasMoreThan9Characters == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   continued() {
     _currentStep < 3
         ? setState(() {
-            _currentStep += 1;
+            _currentStep == 0 && isValidEmail(emailController.text)
+                ? _currentStep += 1
+                : _currentStep == 1 && passwordFilled()
+                    ? _currentStep += 1
+                    : _currentStep == 2 &&
+                            goalSelected.isNotEmpty &&
+                            incomeSelected.isNotEmpty &&
+                            expenseSelected.isNotEmpty
+                        ? _currentStep += 1
+                        : _currentStep == 3 &&
+                                selectedDateFormatted != null &&
+                                selectedTimeFormatted != null
+                            ? _currentStep += 1
+                            : _showToast(context);
           })
         : _showToast(context);
     changeBgColor(_currentStep);
@@ -180,6 +204,59 @@ class _RegisterStepsState extends State<RegisterSteps> {
         selectedTime = picked;
         selectedTimeFormatted = "${selectedTime.hour}:${selectedTime.minute}";
       });
+  }
+
+  void passStatusStrength() {
+    if (hasLowercase == true && hasUppercase == true ||
+        hasDigits == true ||
+        hasMoreThan9Characters == true) {
+      complexity = Text("Weak", style: TextStyle(color: Colors.amber));
+    }
+    if (hasLowercase == true && hasUppercase == true && hasDigits == true ||
+        hasMoreThan9Characters == true) {
+      complexity = Text("Medium", style: TextStyle(color: Colors.limeAccent));
+    }
+    if (hasLowercase == true &&
+        hasUppercase == true &&
+        hasDigits == true &&
+        hasMoreThan9Characters == true) {
+      complexity = Text("Strong", style: TextStyle(color: Colors.lightGreen));
+    }
+  }
+
+  passValidator() {
+    if (passwordController.text.isNotEmpty) {
+      if (passwordController.text.contains(RegExp(r'[a-z]'))) {
+        hasLowercase = true;
+      }
+      if (passwordController.text.contains(RegExp(r'[A-Z]'))) {
+        hasUppercase = true;
+      }
+      if (passwordController.text.contains(RegExp(r'[0-9]'))) {
+        hasDigits = true;
+      }
+      if (passwordController.text.length > 9) {
+        hasMoreThan9Characters = true;
+      }
+
+      passStatusStrength();
+    } else {
+      hasLowercase = false;
+      hasUppercase = false;
+      hasDigits = false;
+      hasMoreThan9Characters = false;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(() {
+      setState(() {
+        passValidator();
+        // return passwordFilled();
+      });
+    });
   }
 
   Widget emailPage() {
@@ -570,9 +647,7 @@ class _RegisterStepsState extends State<RegisterSteps> {
                       isActive: _currentStep >= 3,
                     ),
                     CustomStep(
-                      content: Container(
-                        child: Text("4"),
-                      ),
+                      content: videoCallSchedule(),
                       isActive: _currentStep >= 4,
                     ),
                   ],
