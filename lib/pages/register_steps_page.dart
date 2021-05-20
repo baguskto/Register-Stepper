@@ -1,3 +1,4 @@
+import 'package:bank_jago_assesment/constant.dart';
 import 'package:bank_jago_assesment/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -12,20 +13,21 @@ class _RegisterStepsState extends State<RegisterSteps> {
   Color bgColor = Colors.white;
   TextEditingController emailController = TextEditingController();
 
-
   bool hidePassword = true;
   TextEditingController passwordController = TextEditingController();
   bool hasLowercase, hasUppercase, hasDigits, hasMoreThan9Characters = false;
+
+  String goalSelected, incomeSelected, expenseSelected;
+
 
   Text complexity = Text(
     "Very weak",
     style: TextStyle(color: Colors.amberAccent),
   );
 
-
   bool isValidEmail(input) {
     return RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(input);
   }
 
@@ -76,7 +78,6 @@ class _RegisterStepsState extends State<RegisterSteps> {
     }
   }
 
-
   Widget emailPage() {
     return Container(
       color: Colors.lightBlue,
@@ -103,7 +104,7 @@ class _RegisterStepsState extends State<RegisterSteps> {
                     Text(
                       "Welcome to",
                       style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
                     ),
                     Row(
                       children: [
@@ -146,7 +147,7 @@ class _RegisterStepsState extends State<RegisterSteps> {
                         keyboardType: TextInputType.emailAddress,
                         onSaved: (input) => emailController.text = input,
                         validator: (input) =>
-                        !isValidEmail(input) ? "Email tidak valid" : null,
+                            !isValidEmail(input) ? "Email tidak valid" : null,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.grey.shade200,
@@ -180,7 +181,6 @@ class _RegisterStepsState extends State<RegisterSteps> {
       ),
     );
   }
-
 
   Widget passwordPage() {
     return Container(
@@ -217,7 +217,7 @@ class _RegisterStepsState extends State<RegisterSteps> {
               fillColor: Colors.white,
               filled: true,
               contentPadding:
-              EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               hintText: 'Create Password',
               hintStyle: TextStyle(color: Colors.grey),
               suffixIcon: IconButton(
@@ -287,6 +287,75 @@ class _RegisterStepsState extends State<RegisterSteps> {
     );
   }
 
+  Widget personalInfo() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      height: MediaQuery.of(context).size.height / 1.5,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Personal Information",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "Please fill in the information below and your goal for digital saving.",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          WidgetPersonalInfoField(
+            label: "Goal of Activation",
+            chosenValue: goalSelected,
+            options: Constant.personalGoalOption,
+            onChange: (String value) {
+              setState(() {
+                goalSelected = value;
+              });
+            },
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          WidgetPersonalInfoField(
+            label: "Monthly Income",
+            chosenValue: incomeSelected,
+            options: Constant.personalIncomeOption,
+            onChange: (String value) {
+              setState(() {
+                incomeSelected = value;
+              });
+            },
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          WidgetPersonalInfoField(
+            label: "Monthly Expenpense",
+            chosenValue: expenseSelected,
+            options: Constant.personalExpensesOption,
+            onChange: (String value) {
+              setState(() {
+                expenseSelected = value;
+              });
+            },
+          ),
+          SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -331,15 +400,11 @@ class _RegisterStepsState extends State<RegisterSteps> {
                       isActive: _currentStep >= 1,
                     ),
                     CustomStep(
-                      content: Container(
-                        child: Text("2"),
-                      ),
+                      content: passwordPage(),
                       isActive: _currentStep >= 2,
                     ),
                     CustomStep(
-                      content: Container(
-                        child: Text("3"),
-                      ),
+                      content: personalInfo(),
                       isActive: _currentStep >= 3,
                     ),
                     CustomStep(
